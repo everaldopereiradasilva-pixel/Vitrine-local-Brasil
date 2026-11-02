@@ -58,11 +58,11 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden">
 
-    <!-- Top Navigation Header (Botão admin oculto dos clientes, acesso via duplo clique no Logo) -->
+    <!-- Top Navigation Header (Acesso Admin via duplo clique no Logo) -->
     <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-xl h-[65px] flex items-center">
         <div class="max-w-md mx-auto w-full px-3 flex items-center justify-between gap-1">
-            <!-- Logo Regional SP com acionador oculto do Admin (Duplo Clique) -->
-            <div class="flex items-center space-x-2 cursor-pointer select-none" ondblclick="openAdminModal()" title="Dê duplo clique para gerenciar">
+            <!-- Logo Regional SP -->
+            <div class="flex items-center space-x-2 cursor-pointer select-none" ondblclick="openAdminModal()" title="Duplo clique para gerenciar">
                 <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-amber-500 flex items-center justify-center shadow-lg shadow-red-600/40 neon-glow">
                     <i class="fa-solid fa-store text-white text-sm"></i>
                 </div>
@@ -74,7 +74,7 @@
                 </div>
             </div>
 
-            <!-- Ações Rápidas do Cabeçalho (Sem o botão admin visível para clientes) -->
+            <!-- Ações Rápidas do Cabeçalho -->
             <div class="flex items-center gap-1.5">
                 <button onclick="openModal('modal-renovar')" class="bg-amber-600/90 hover:bg-amber-500 text-white text-xs px-2.5 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
                     <i class="fa-solid fa-rotate text-xs"></i> Renovar
@@ -112,11 +112,11 @@
         </div>
 
         <div id="sp-feed-container" class="sp-feed w-full">
-            <!-- Os cards de fotos de SP serão renderizados via JavaScript -->
+            <!-- Cards dinâmicos do feed -->
         </div>
     </main>
 
-    <!-- MODAL 1: Formulário de Cadastro com Até 5 Imagens e Pagamento -->
+    <!-- MODAL 1: Formulário de Cadastro -->
     <div id="modal-cadastrar" class="fixed inset-0 bg-black/85 z-50 hidden items-center justify-center p-2 sm:p-4 overflow-y-auto">
         <div class="bg-slate-900 rounded-xl border border-slate-800 max-w-md w-full p-4 sm:p-6 relative my-auto max-h-[90vh] overflow-y-auto shadow-2xl">
             <button onclick="closeModal('modal-cadastrar')" class="absolute top-3 right-3 text-slate-400 hover:text-white p-2">
@@ -129,14 +129,12 @@
             <p class="text-xs text-slate-400 mb-3">Selecione <strong>até 5 fotos</strong> dos seus produtos diretamente da sua galeria.</p>
 
             <form id="form-cadastro" onsubmit="submitCadastro(event)" class="space-y-3">
-                
-                <!-- SELEÇÃO DE ATÉ 5 FOTOS DA GALERIA -->
                 <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
                     <label class="block text-xs font-bold text-emerald-400 mb-1 flex items-center gap-1.5">
                         <i class="fa-solid fa-images text-red-500 text-sm"></i> Fotos dos Produtos (Selecione até 5):
                     </label>
                     <input type="file" id="cad-image-files" accept="image/*" multiple required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-500 cursor-pointer">
-                    <p class="text-[10px] text-slate-400 mt-1">Dica: Selecione múltiplos ficheiros na galeria do seu telemóvel para enviar até 5 imagens.</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Dica: Selecione múltiplos ficheiros na galeria do seu celular.</p>
                 </div>
 
                 <div>
@@ -166,7 +164,6 @@
                     </div>
                 </div>
 
-                <!-- CIDADE DO ESTADO DE SÃO PAULO -->
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-300 mb-1">Cidade de São Paulo (SP):</label>
                     <select id="cad-city" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
@@ -226,7 +223,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE SUCESSO DE CADASTRO -->
+    <!-- MODAL DE SUCESSO -->
     <div id="modal-sucesso-cliente" class="fixed inset-0 bg-black/85 z-50 hidden items-center justify-center p-4">
         <div class="bg-slate-900 rounded-xl border border-slate-800 max-w-xs w-full p-5 relative text-center shadow-2xl">
             <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-2 text-lg">
@@ -310,7 +307,7 @@
         </div>
     </div>
 
-    <!-- MODAL 4: Painel Admin (Oculto para clientes) -->
+    <!-- MODAL 4: Painel Admin (Acesso Oculto por Duplo Clique no Logo) -->
     <div id="modal-admin" class="fixed inset-0 bg-black/85 z-50 hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-slate-900 rounded-xl border border-slate-800 max-w-lg w-full p-5 relative my-auto shadow-2xl">
             <button onclick="closeModal('modal-admin')" class="absolute top-3 right-3 text-slate-400 hover:text-white">
@@ -357,7 +354,7 @@
         </div>
     </footer>
 
-    <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT CORRIGIDO COM NAVEGAÇÃO SEGURA PARA WHATSAPP -->
     <script>
         let db;
         let announcements = [];
@@ -370,6 +367,7 @@
         let tempClientImageBlobs = [];
         let novoAnuncioId = null;
 
+        // Formata o WhatsApp garantindo o código +55 correto
         function formatWhatsAppNumber(phone) {
             let digits = String(phone).replace(/\D/g, '');
             if (digits.length === 0) return '55';
@@ -377,6 +375,21 @@
                 digits = '55' + digits;
             }
             return digits;
+        }
+
+        // FUNÇÃO DE NAVEGAÇÃO UNIVERSAL PARA O WHATSAPP (CORRIGE O ERRO EM WEBVIEWS E ANDROID)
+        function redirectWhatsApp(cleanPhone, textMessage) {
+            const encodedText = encodeURIComponent(textMessage);
+            const targetUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
+            
+            try {
+                const newWindow = window.open(targetUrl, '_blank');
+                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                    window.location.href = targetUrl;
+                }
+            } catch (e) {
+                window.location.href = targetUrl;
+            }
         }
 
         function initDB() {
@@ -542,14 +555,14 @@ O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
 
         function openWhatsAppAdmin(customMessage) {
             let cleanPhone = formatWhatsAppNumber(settings.adminWhatsApp);
-            const messageEncoded = encodeURIComponent(customMessage || 'Olá Admin! Novo anúncio na fila.');
-            window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${messageEncoded}`, '_blank', 'noopener,noreferrer');
+            const msg = customMessage || 'Olá Admin! Novo anúncio na fila.';
+            redirectWhatsApp(cleanPhone, msg);
         }
 
         function chamarWhatsAppCliente(phone, name) {
             let cleanPhone = formatWhatsAppNumber(phone);
-            const msg = encodeURIComponent(`Olá ${name}! Vi o seu anúncio na Vitrine Local SP e gostaria de mais informações sobre os produtos.`);
-            window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${msg}`, '_blank', 'noopener,noreferrer');
+            const msg = `Olá ${name}! Vi o seu anúncio na Vitrine Local SP e gostaria de mais informações sobre os produtos.`;
+            redirectWhatsApp(cleanPhone, msg);
         }
 
         window.mudarFotoCard = function(cardId, direction, total) {
