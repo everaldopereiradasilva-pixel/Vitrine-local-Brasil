@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vitrine Local Brasil - Vídeos & Anúncios</title>
+    <title>Vitrine Local SP - Anúncios & Negócios</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- PWA Web App Manifest dinâmico com Ícone Ultra Chamativo -->
+    <!-- PWA Web App Manifest dinâmico -->
     <script>
         const manifestData = {
-            "name": "Vitrine Local Brasil",
-            "short_name": "VitrineLocal",
+            "name": "Vitrine Local SP",
+            "short_name": "VitrineSP",
             "start_url": "./",
             "display": "standalone",
             "background_color": "#000000",
@@ -37,47 +37,44 @@
         .badge-destaque {
             background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
         }
-        /* Snap scrolling estilo TikTok / Reels */
-        .tiktok-feed {
+        /* Feed com rolagem vertical suave estilo Cards */
+        .sp-feed {
             scroll-snap-type: y mandatory;
             overflow-y: scroll;
             height: calc(100vh - 65px - 33px);
             -webkit-overflow-scrolling: touch;
         }
-        .tiktok-item {
+        .sp-item {
             scroll-snap-align: start;
             scroll-snap-stop: always;
             height: calc(100vh - 65px - 33px);
             flex-shrink: 0;
             position: relative;
         }
-        /* Ícone e Header com brilho chamativo */
         .neon-glow {
             filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden" onclick="ativarAudioGlobal()">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden">
 
-    <!-- BARRA FLUTUANTE DE ATIVAÇÃO DE SOM GLOBAL -->
-    <div id="global-audio-bar" class="bg-red-600 text-white text-xs py-1.5 px-4 text-center font-bold cursor-pointer z-50 flex items-center justify-center gap-2 shadow-lg animate-pulse" onclick="ativarAudioGlobal()">
-        <i class="fa-solid fa-volume-high text-sm"></i> Toque aqui para ativar o som de todos os vídeos instantaneamente!
-    </div>
-
-    <!-- Top Navigation Header com Botão Admin Integrado -->
+    <!-- Top Navigation Header -->
     <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-xl h-[65px] flex items-center">
         <div class="max-w-md mx-auto w-full px-3 flex items-center justify-between gap-1">
-            <!-- Logo e Título com Ícone Chamativo -->
+            <!-- Logo Regional SP -->
             <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-amber-500 flex items-center justify-center shadow-lg shadow-red-600/40 neon-glow animate-pulse">
-                    <i class="fa-solid fa-play text-white text-sm ml-0.5"></i>
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-amber-500 flex items-center justify-center shadow-lg shadow-red-600/40 neon-glow">
+                    <i class="fa-solid fa-store text-white text-sm"></i>
                 </div>
-                <h1 class="text-sm font-extrabold bg-gradient-to-r from-white via-slate-200 to-red-400 bg-clip-text text-transparent tracking-wide">
-                    Vitrine Reels
-                </h1>
+                <div>
+                    <h1 class="text-sm font-extrabold bg-gradient-to-r from-white via-slate-200 to-red-400 bg-clip-text text-transparent tracking-wide">
+                        Vitrine Local SP
+                    </h1>
+                    <p class="text-[9px] text-emerald-400 font-bold -mt-0.5"><i class="fa-solid fa-location-dot"></i> Exclusivo Estado de SP</p>
+                </div>
             </div>
 
-            <!-- Ações Rápidas incluindo o Botão Admin -->
+            <!-- Ações Rápidas do Cabeçalho -->
             <div class="flex items-center gap-1">
                 <button onclick="openAdminModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md border border-slate-700" title="Painel Admin">
                     <i class="fa-solid fa-lock text-[10px] text-amber-400"></i> Admin
@@ -85,8 +82,8 @@
                 <button onclick="openModal('modal-renovar')" class="bg-amber-600/90 hover:bg-amber-500 text-white text-[11px] px-2 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
                     <i class="fa-solid fa-rotate text-[10px]"></i> Renovar
                 </button>
-                <button onclick="openModal('modal-cadastrar')" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] px-2 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
-                    <i class="fa-solid fa-plus text-[10px]"></i> Anunciar
+                <button onclick="openModal('modal-cadastrar')" class="bg-red-600 hover:bg-red-500 text-white text-[11px] px-2 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
+                    <i class="fa-solid fa-images text-[10px]"></i> Anunciar (Até 5 Fotos)
                 </button>
             </div>
         </div>
@@ -96,33 +93,33 @@
     <div id="client-status-banner" class="hidden bg-emerald-900/95 border-b border-emerald-600 px-3 py-1.5 text-center text-xs text-emerald-100 flex items-center justify-between z-30 shadow-md">
         <div class="flex items-center gap-2 truncate">
             <i class="fa-solid fa-circle-check text-emerald-400 text-sm flex-shrink-0"></i>
-            <span class="truncate">Sucesso! O seu vídeo já está a rodar na vitrine do Reels.</span>
+            <span class="truncate">Sucesso! O seu anúncio com fotos já está a rodar na Vitrine SP.</span>
         </div>
         <button onclick="document.getElementById('client-status-banner').classList.add('hidden')" class="ml-2 text-emerald-300 hover:text-white font-bold">&times;</button>
     </div>
 
-    <!-- VITRINE DE REELS (FEED VERTICAL) -->
+    <!-- FEED DA VITRINE DE ANÚNCIOS (SÓ ESTADO DE SP) -->
     <main class="w-full flex-1 max-w-md mx-auto relative bg-black">
         
         <!-- BARRINHA / CAMPO RÁPIDO FIXO SOBRE A VITRINE -->
         <div class="absolute top-3 left-3 right-3 z-30 flex items-center justify-between bg-slate-900/85 backdrop-blur-md border border-slate-700/80 p-2 rounded-xl shadow-2xl">
             <div class="flex items-center gap-2 pl-1 truncate">
                 <div class="w-6 h-6 rounded-full bg-red-600/20 text-red-500 flex items-center justify-center flex-shrink-0 animate-bounce">
-                    <i class="fa-solid fa-video text-xs"></i>
+                    <i class="fa-solid fa-images text-xs"></i>
                 </div>
-                <span class="text-xs font-semibold text-slate-200 truncate">Quer divulgar o seu vídeo aqui?</span>
+                <span class="text-xs font-semibold text-slate-200 truncate">Poste até 5 fotos dos produtos!</span>
             </div>
             <button onclick="openModal('modal-cadastrar')" class="bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg transition flex items-center gap-1 flex-shrink-0">
-                <i class="fa-solid fa-upload text-[11px]"></i> Adicionar & Pagar
+                <i class="fa-solid fa-upload text-[11px]"></i> Anunciar & Pagar
             </button>
         </div>
 
-        <div id="tiktok-container" class="tiktok-feed w-full">
-            <!-- Os cards de vídeo serão renderizados via JavaScript -->
+        <div id="sp-feed-container" class="sp-feed w-full">
+            <!-- Os cards de fotos de SP serão renderizados via JavaScript -->
         </div>
     </main>
 
-    <!-- MODAL 1: Formulário de Cadastro com Vídeo de Propaganda e Pagamento -->
+    <!-- MODAL 1: Formulário de Cadastro com Até 5 Imagens e Pagamento -->
     <div id="modal-cadastrar" class="fixed inset-0 bg-black/85 z-50 hidden items-center justify-center p-2 sm:p-4 overflow-y-auto">
         <div class="bg-slate-900 rounded-xl border border-slate-800 max-w-md w-full p-4 sm:p-6 relative my-auto max-h-[90vh] overflow-y-auto shadow-2xl">
             <button onclick="closeModal('modal-cadastrar')" class="absolute top-3 right-3 text-slate-400 hover:text-white p-2">
@@ -130,18 +127,19 @@
             </button>
             
             <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
-                <i class="fa-solid fa-video text-red-500"></i> Publicar Vídeo na Vitrine
+                <i class="fa-solid fa-images text-red-500"></i> Anunciar na Vitrine de SP
             </h3>
-            <p class="text-xs text-slate-400 mb-3">Envie o seu vídeo (Armazenamento Ilimitado).</p>
+            <p class="text-xs text-slate-400 mb-3">Selecione **até 5 fotos** dos seus produtos diretamente da sua galeria.</p>
 
             <form id="form-cadastro" onsubmit="submitCadastro(event)" class="space-y-3">
-                <!-- VÍDEO DE PROPAGANDA -->
+                
+                <!-- SELEÇÃO DE ATÉ 5 FOTOS DA GALERIA -->
                 <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
                     <label class="block text-xs font-bold text-emerald-400 mb-1 flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-video text-red-500 text-sm"></i> Selecionar Vídeo (MP4/WebM):
+                        <i class="fa-solid fa-images text-red-500 text-sm"></i> Fotos dos Produtos (Selecione até 5):
                     </label>
-                    <input type="file" id="cad-video-file" accept="video/*" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-500 cursor-pointer">
-                    <p class="text-[10px] text-slate-400 mt-1">Dica: Suporte total a arquivos grandes sem limite de espaço.</p>
+                    <input type="file" id="cad-image-files" accept="image/*" multiple required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-500 cursor-pointer">
+                    <p class="text-[10px] text-slate-400 mt-1">Dica: Segure Ctrl (ou selecione múltiplos ficheiros no telemóvel) para escolher até 5 imagens.</p>
                 </div>
 
                 <div>
@@ -171,30 +169,26 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-300 mb-1">Estado (UF):</label>
-                        <select id="cad-state" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
-                            <option value="SP">São Paulo (SP)</option>
-                            <option value="RJ">Rio de Janeiro (RJ)</option>
-                            <option value="MG">Minas Gerais (MG)</option>
-                            <option value="PR">Paraná (PR)</option>
-                            <option value="SC">Santa Catarina (SC)</option>
-                            <option value="RS">Rio Grande do Sul (RS)</option>
-                            <option value="BA">Bahia (BA)</option>
-                            <option value="GO">Goiás (GO)</option>
-                            <option value="OUTRO">Outro Estado</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-300 mb-1">Cidade:</label>
-                        <input type="text" id="cad-city" required placeholder="Ex: Hortolândia" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
-                    </div>
+                <!-- CIDADE DO ESTADO DE SÃO PAULO -->
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1">Cidade de São Paulo (SP):</label>
+                    <select id="cad-city" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+                        <option value="Hortolândia">Hortolândia (SP)</option>
+                        <option value="Campinas">Campinas (SP)</option>
+                        <option value="São Paulo">São Paulo (Capital)</option>
+                        <option value="Sumaré">Sumaré (SP)</option>
+                        <option value="Americana">Americana (SP)</option>
+                        <option value="Indaiatuba">Indaiatuba (SP)</option>
+                        <option value="Piracicaba">Piracicaba (SP)</option>
+                        <option value="Sorocaba">Sorocaba (SP)</option>
+                        <option value="Santos">Santos (SP)</option>
+                        <option value="Outra Cidade SP">Outra Cidade de SP</option>
+                    </select>
                 </div>
 
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-300 mb-1">Nome do Estabelecimento / Negócio:</label>
-                    <input type="text" id="cad-name" required placeholder="Ex: Hamburgueria Silva" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+                    <input type="text" id="cad-name" required placeholder="Ex: Loja de Roupas Silva" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -210,8 +204,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-300 mb-1">Telefone (DDD + Nº):</label>
-                        <input type="tel" id="cad-phone" required placeholder="19 99999-9999" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+                        <label class="block text-[11px] font-semibold text-emerald-400 mb-1"><i class="fa-brands fa-whatsapp"></i> WhatsApp (DDD + Nº):</label>
+                        <input type="tel" id="cad-whatsapp" required placeholder="19 99999-9999" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
                     </div>
                 </div>
 
@@ -221,8 +215,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-300 mb-1">Descrição / Promoção:</label>
-                    <textarea id="cad-desc" rows="2" required placeholder="Descreva a oferta..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200"></textarea>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1">Descrição / Promoção dos Produtos:</label>
+                    <textarea id="cad-desc" rows="2" required placeholder="Descreva os produtos anunciados..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200"></textarea>
                 </div>
 
                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs sm:text-sm transition mt-2 flex items-center justify-center gap-1 shadow-lg">
@@ -232,18 +226,15 @@
         </div>
     </div>
 
-    <!-- MODAL DE SUCESSO DE CADASTRO COM DOWNLOAD -->
+    <!-- MODAL DE SUCESSO DE CADASTRO COM DOWNLOAD DAS FOTOS -->
     <div id="modal-sucesso-cliente" class="fixed inset-0 bg-black/85 z-50 hidden items-center justify-center p-4">
         <div class="bg-slate-900 rounded-xl border border-slate-800 max-w-xs w-full p-5 relative text-center shadow-2xl">
             <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-2 text-lg">
                 <i class="fa-solid fa-check"></i>
             </div>
-            <h3 class="text-base font-bold text-white mb-1">Vídeo Enviado com Sucesso!</h3>
-            <p class="text-[11px] text-slate-400 mb-3">Guarde uma cópia do seu vídeo na sua galeria:</p>
+            <h3 class="text-base font-bold text-white mb-1">Fotos Enviadas com Sucesso!</h3>
+            <p class="text-[11px] text-slate-400 mb-3">Seu anúncio com até 5 fotos está pronto.</p>
             
-            <button id="btn-download-proprio" onclick="downloadMeuVideo()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center gap-1.5 mb-2">
-                <i class="fa-solid fa-download"></i> Baixar Meu Vídeo na Galeria
-            </button>
             <button onclick="prosseguirParaPix()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
                 Continuar para o Pagamento Pix <i class="fa-solid fa-arrow-right"></i>
             </button>
@@ -257,7 +248,7 @@
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
             <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
-                <i class="fa-solid fa-arrows-rotate text-amber-400"></i> Renovar ou Trocar Plano
+                <i class="fa-solid fa-arrows-rotate text-amber-400"></i> Renovar Anúncio
             </h3>
             <form onsubmit="handleRenovacao(event)" class="space-y-3">
                 <div>
@@ -314,7 +305,7 @@
             </div>
 
             <button onclick="confirmarPagamentoPix()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-lg">
-                <i class="fa-solid fa-circle-check text-sm"></i> Já Fiz o Pix / Ver Meu Vídeo na Vitrine
+                <i class="fa-solid fa-circle-check text-sm"></i> Já Fiz o Pix / Ver Anúncio na Vitrine
             </button>
         </div>
     </div>
@@ -336,7 +327,7 @@
             </div>
             <div id="admin-dashboard-view" class="hidden">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-base font-bold text-white">Configurações & Gestão</h3>
+                    <h3 class="text-base font-bold text-white">Configurações & Gestão (SP)</h3>
                     <button onclick="logoutAdmin()" class="text-[11px] bg-slate-800 px-2.5 py-1 rounded text-slate-300">Sair</button>
                 </div>
                 <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 mb-4 space-y-2">
@@ -349,7 +340,7 @@
                     </div>
                 </div>
                 <div>
-                    <h4 class="text-xs font-bold text-slate-300 mb-2">Anúncios no Ar</h4>
+                    <h4 class="text-xs font-bold text-slate-300 mb-2">Anúncios no Ar em SP</h4>
                     <div id="admin-active-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
                 </div>
             </div>
@@ -359,14 +350,14 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 py-2 text-center text-[10px] text-slate-500 z-30 h-[33px] flex items-center justify-center">
         <div class="max-w-md mx-auto w-full px-4 flex justify-between items-center">
-            <p>© 2026 Vitrine Local Reels</p>
+            <p>© 2026 Vitrine Local SP - Exclusivo São Paulo</p>
             <span class="text-slate-400 flex items-center gap-1">
-                <i class="fa-solid fa-bolt text-[9px] text-emerald-400"></i> Sistema Ativo
+                <i class="fa-solid fa-bolt text-[9px] text-emerald-400"></i> Até 5 Fotos por Anúncio
             </span>
         </div>
     </footer>
 
-    <!-- JAVASCRIPT COM AUTOPLAY DE ÁUDIO IMEDIATO E INDEXEDDB -->
+    <!-- JAVASCRIPT DO SISTEMA REGIONAL DE SP COM SUPORTE A 5 FOTOS -->
     <script>
         let db;
         let announcements = [];
@@ -376,13 +367,12 @@
             adminWhatsApp: '5519989698007'
         };
         let activeCadastro = null;
-        let tempClientVideoBlob = null;
-        let tempClientName = '';
+        let tempClientImageBlobs = [];
         let novoAnuncioId = null;
 
         function initDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open('VitrineReelsInfinitDB', 1);
+                const request = indexedDB.open('VitrineSPMultiImagesDB', 1);
                 request.onerror = () => reject(request.error);
                 request.onsuccess = () => {
                     db = request.result;
@@ -390,40 +380,40 @@
                 };
                 request.onupgradeneeded = (event) => {
                     const database = event.target.result;
-                    if (!database.objectStoreNames.contains('videos')) {
-                        database.createObjectStore('videos', { keyPath: 'id' });
+                    if (!database.objectStoreNames.contains('images')) {
+                        database.createObjectStore('images', { keyPath: 'id' });
                     }
                 };
             });
         }
 
-        function saveVideoToDB(id, blob) {
+        function saveImagesToDB(id, blobsArray) {
             return new Promise((resolve, reject) => {
                 if (!db) { resolve(); return; }
-                const transaction = db.transaction(['videos'], 'readwrite');
-                const store = transaction.objectStore('videos');
-                store.put({ id: id, blob: blob });
+                const transaction = db.transaction(['images'], 'readwrite');
+                const store = transaction.objectStore('images');
+                store.put({ id: id, blobs: blobsArray });
                 transaction.oncomplete = () => resolve();
                 transaction.onerror = () => reject(transaction.error);
             });
         }
 
-        function getVideoFromDB(id) {
+        function getImagesFromDB(id) {
             return new Promise((resolve) => {
-                if (!db) { resolve(null); return; }
-                const transaction = db.transaction(['videos'], 'readonly');
-                const store = transaction.objectStore('videos');
+                if (!db) { resolve([]); return; }
+                const transaction = db.transaction(['images'], 'readonly');
+                const store = transaction.objectStore('images');
                 const request = store.get(id);
-                request.onsuccess = () => resolve(request.result ? request.result.blob : null);
-                request.onerror = () => resolve(null);
+                request.onsuccess = () => resolve(request.result ? request.result.blobs : []);
+                request.onerror = () => resolve([]);
             });
         }
 
-        function deleteVideoFromDB(id) {
+        function deleteImagesFromDB(id) {
             return new Promise((resolve) => {
                 if (!db) { resolve(); return; }
-                const transaction = db.transaction(['videos'], 'readwrite');
-                const store = transaction.objectStore('videos');
+                const transaction = db.transaction(['images'], 'readwrite');
+                const store = transaction.objectStore('images');
                 store.delete(id);
                 transaction.oncomplete = () => resolve();
             });
@@ -437,7 +427,7 @@
         });
 
         function loadStorage() {
-            const saved = localStorage.getItem('vitrine_reels_announcements_meta');
+            const saved = localStorage.getItem('vitrine_sp_multi_announcements_meta');
             if (saved) {
                 try { announcements = JSON.parse(saved); } catch (e) { announcements = []; }
             } 
@@ -450,10 +440,14 @@
                         city: "Hortolândia",
                         category: "Alimentação",
                         plan: "destaque",
-                        phone: "019 98877-6655",
+                        whatsapp: "5519988776655",
                         address: "Av. Brasil, 450 - Centro",
-                        description: "Os melhores hambúrgueres artesanais na grelha!",
-                        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                        description: "Os melhores hambúrgueres artesanais na grelha de Hortolândia e região!",
+                        imageUrls: [
+                            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1000&auto=format&fit=crop",
+                            "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1000&auto=format&fit=crop",
+                            "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=1000&auto=format&fit=crop"
+                        ],
                         isRemote: true,
                         expiresAt: new Date(Date.now() + 30*24*60*60*1000).toISOString()
                     }
@@ -473,7 +467,7 @@
 
         function saveAnnouncementsMeta() {
             try {
-                localStorage.setItem('vitrine_reels_announcements_meta', JSON.stringify(announcements));
+                localStorage.setItem('vitrine_sp_multi_announcements_meta', JSON.stringify(announcements));
             } catch (err) {}
             updateRenovacaoOptions();
         }
@@ -482,20 +476,7 @@
             const sel = document.getElementById('renovar-select-item');
             if (!sel) return;
             sel.innerHTML = '<option value="">Selecione o seu anúncio...</option>' + 
-                announcements.map(i => `<option value="${i.id}">${i.name} (${i.city}/${i.state})</option>`).join('');
-        }
-
-        function downloadMeuVideo() {
-            if (!tempClientVideoBlob) return;
-            const a = document.createElement('a');
-            const url = URL.createObjectURL(tempClientVideoBlob);
-            a.href = url;
-            a.target = '_blank';
-            a.download = `meu_video_${tempClientName.toLowerCase().replace(/[^a-z0-9]/g, '_')}.mp4`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
+                announcements.map(i => `<option value="${i.id}">${i.name} (${i.city}/SP)</option>`).join('');
         }
 
         function prosseguirParaPix() {
@@ -510,8 +491,8 @@
         async function confirmarPagamentoPix() {
             if (!activeCadastro) return;
 
-            if (tempClientVideoBlob && !activeCadastro.isRemote) {
-                await saveVideoToDB(activeCadastro.id, tempClientVideoBlob);
+            if (tempClientImageBlobs.length > 0 && !activeCadastro.isRemote) {
+                await saveImagesToDB(activeCadastro.id, tempClientImageBlobs);
             }
 
             announcements.push(activeCadastro);
@@ -527,15 +508,15 @@
 
             document.getElementById('client-status-banner').classList.remove('hidden');
 
-            const msg = `🔥 *NOVO PIX REALIZADO - PROPAGANDA ADICIONADA NA FILA*
+            const msg = `🔥 *NOVO PIX REALIZADO - ANÚNCIO COM FOTOS EM SP*
 
 *Estabelecimento:* ${activeCadastro.name}
 *Plano:* ${activeCadastro.plan.toUpperCase()}
-*Cidade:* ${activeCadastro.city}/${activeCadastro.state}
-*Telefone:* ${activeCadastro.phone}
+*Cidade:* ${activeCadastro.city}/SP
+*WhatsApp Cliente:* ${activeCadastro.whatsapp}
 *Descrição:* ${activeCadastro.description}
 
-O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do Reels!`;
+O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
             
             openWhatsAppAdmin(msg);
             
@@ -547,69 +528,55 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             }, 200);
 
             activeCadastro = null;
-            tempClientVideoBlob = null;
+            tempClientImageBlobs = [];
         }
 
         function openWhatsAppAdmin(customMessage) {
             let cleanPhone = String(settings.adminWhatsApp).replace(/\D/g, '');
             if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) cleanPhone = '55' + cleanPhone;
-            const messageEncoded = encodeURIComponent(customMessage || 'Olá Admin! Nova propaganda na fila.');
+            const messageEncoded = encodeURIComponent(customMessage || 'Olá Admin! Novo anúncio na fila.');
             window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${messageEncoded}`, '_blank', 'noopener,noreferrer');
         }
 
-        // Tenta ativar o som imediatamente ao carregar ou interagir
-        function ativarAudioGlobal() {
-            const videos = document.querySelectorAll('.tiktok-item video');
-            videos.forEach(v => {
-                v.muted = false;
-                v.play().catch(()=>{});
-            });
-            const audioBar = document.getElementById('global-audio-bar');
-            if(audioBar) audioBar.style.display = 'none';
+        function chamarWhatsAppCliente(phone, name) {
+            let cleanPhone = String(phone).replace(/\D/g, '');
+            if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) cleanPhone = '55' + cleanPhone;
+            const msg = encodeURIComponent(`Olá ${name}! Vi o seu anúncio na Vitrine Local SP e gostaria de mais informações sobre os produtos.`);
+            window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${msg}`, '_blank', 'noopener,noreferrer');
         }
 
-        function togglePlayPause(videoId, overlayIconId) {
-            const vid = document.getElementById(videoId);
-            const icon = document.getElementById(overlayIconId);
-            if (!vid) return;
-            
-            vid.muted = false;
+        // Funções para alternar as fotos do carrossel do card
+        window.mudarFotoCard = function(cardId, direction, total) {
+            let currentIndex = parseInt(window.eval(`cardIndex_${cardId}`) || 0);
+            currentIndex += direction;
+            if (currentIndex < 0) currentIndex = total - 1;
+            if (currentIndex >= total) currentIndex = 0;
+            window.eval(`cardIndex_${cardId} = ${currentIndex}`);
 
-            if (vid.paused) {
-                vid.play().then(() => {
-                    if (icon) {
-                        icon.className = 'fa-solid fa-play text-white text-5xl opacity-80 animate-ping';
-                        setTimeout(() => icon.className = 'hidden', 500);
-                    }
-                }).catch(e => {});
-            } else {
-                vid.pause();
-                if (icon) {
-                    icon.className = 'fa-solid fa-pause text-white text-5xl opacity-80';
-                    icon.classList.remove('hidden');
+            for (let i = 0; i < total; i++) {
+                const imgEl = document.getElementById(`img-${cardId}-${i}`);
+                if (imgEl) {
+                    imgEl.style.display = (i === currentIndex) ? 'block' : 'none';
                 }
             }
-        }
-
-        function toggleMute(btn, videoId) {
-            const vid = document.getElementById(videoId);
-            if (!vid) return;
-            vid.muted = !vid.muted;
-            btn.innerHTML = vid.muted ? '<i class="fa-solid fa-volume-xmark"></i>' : '<i class="fa-solid fa-volume-high text-emerald-400"></i>';
-        }
+            const counterEl = document.getElementById(`counter-${cardId}`);
+            if (counterEl) {
+                counterEl.innerText = `${currentIndex + 1}/${total}`;
+            }
+        };
 
         function renderAnnouncements() {
             const now = new Date();
             announcements = announcements.filter(item => new Date(item.expiresAt) > now);
 
-            const container = document.getElementById('tiktok-container');
+            const container = document.getElementById('sp-feed-container');
             if (!container) return;
 
             if (announcements.length === 0) {
                 container.innerHTML = `
-                    <div class="tiktok-item flex flex-col items-center justify-center p-6 text-center text-slate-400">
-                        <i class="fa-solid fa-video-slash text-4xl mb-2 text-slate-600"></i>
-                        <p class="text-sm font-semibold">Nenhum vídeo ativo no momento.</p>
+                    <div class="sp-item flex flex-col items-center justify-center p-6 text-center text-slate-400">
+                        <i class="fa-solid fa-image-slash text-4xl mb-2 text-slate-600"></i>
+                        <p class="text-sm font-semibold">Nenhum anúncio ativo em SP no momento.</p>
                     </div>
                 `;
                 return;
@@ -617,33 +584,43 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
 
             container.innerHTML = announcements.map((item) => {
                 const isVIP = item.plan === 'destaque';
+                window[`cardIndex_${item.id}`] = 0;
+                const totalFotos = item.isRemote ? item.imageUrls.length : (item.countBlobs || 1);
 
                 return `
-                <div id="card-${item.id}" class="tiktok-item relative w-full bg-slate-950 flex flex-col justify-end overflow-hidden cursor-pointer" onclick="togglePlayPause('vid-${item.id}', 'icon-${item.id}')">
-                    <video id="vid-${item.id}" loop playsinline webkit-playsinline preload="auto" crossorigin="anonymous" controlslist="nodownload nofullscreen noremoteplayback" oncontextmenu="return false;" class="absolute inset-0 w-full h-full object-cover"></video>
-
-                    <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/95 pointer-events-none"></div>
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                        <i id="icon-${item.id}" class="hidden"></i>
+                <div id="card-${item.id}" class="sp-item relative w-full bg-slate-950 flex flex-col justify-end overflow-hidden">
+                    <!-- Container das imagens (Carrossel) -->
+                    <div id="carousel-${item.id}" class="absolute inset-0 w-full h-full bg-black">
+                        <!-- As imagens serão inseridas dinamicamente via JS -->
                     </div>
 
-                    <button onclick="event.stopPropagation(); toggleMute(this, 'vid-${item.id}')" class="absolute top-20 right-4 bg-black/60 backdrop-blur-md text-white p-3 rounded-full z-20 hover:bg-black/80 transition">
-                        <i class="fa-solid fa-volume-high text-emerald-400"></i>
-                    </button>
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/95 pointer-events-none"></div>
+
+                    ${totalFotos > 1 ? `
+                        <div class="absolute top-20 right-4 bg-black/70 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-xs font-bold z-20 flex items-center gap-1 shadow-lg">
+                            <i class="fa-solid fa-camera text-red-500"></i> <span id="counter-${item.id}">1/${totalFotos}</span>
+                        </div>
+                        <button onclick="mudarFotoCard(${item.id}, -1, ${totalFotos})" class="absolute top-1/2 left-2 -translate-y-1/2 bg-black/60 hover:bg-black/90 text-white w-9 h-9 rounded-full flex items-center justify-center z-20 transition shadow-lg">
+                            <i class="fa-solid fa-chevron-left text-sm"></i>
+                        </button>
+                        <button onclick="mudarFotoCard(${item.id}, 1, ${totalFotos})" class="absolute top-1/2 right-2 -translate-y-1/2 bg-black/60 hover:bg-black/90 text-white w-9 h-9 rounded-full flex items-center justify-center z-20 transition shadow-lg">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </button>
+                    ` : ''}
 
                     ${isVIP ? `
                         <div class="absolute top-20 left-4 badge-destaque text-slate-950 font-bold text-[10px] uppercase px-3 py-1 rounded-full tracking-wider flex items-center gap-1 z-20 shadow-lg pointer-events-none">
-                            <i class="fa-solid fa-crown"></i> VIP Destaque
+                            <i class="fa-solid fa-crown"></i> VIP Destaque SP
                         </div>
                     ` : ''}
 
-                    <div class="relative z-20 p-5 space-y-2 mb-1" onclick="event.stopPropagation()">
+                    <div class="relative z-20 p-5 space-y-2 mb-1">
                         <div class="flex items-center gap-2">
                             <span class="text-[10px] uppercase font-bold text-blue-400 bg-blue-950/80 px-2.5 py-0.5 rounded-full border border-blue-800/50">
                                 ${item.category}
                             </span>
-                            <span class="text-[11px] font-semibold text-slate-300 flex items-center gap-1">
-                                <i class="fa-solid fa-location-dot text-red-500"></i> ${item.city}/${item.state}
+                            <span class="text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
+                                <i class="fa-solid fa-location-dot text-red-500"></i> ${item.city} / SP
                             </span>
                         </div>
 
@@ -654,105 +631,75 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
                             <i class="fa-solid fa-map-pin text-blue-400"></i> ${item.address}
                         </div>
 
-                        <div class="bg-slate-900/90 border border-slate-700/80 rounded-lg p-2 flex items-center justify-between text-xs text-emerald-400 font-mono font-bold">
-                            <span class="text-slate-400 font-sans font-normal text-[11px]"><i class="fa-solid fa-phone text-emerald-400 mr-1"></i> Contato:</span>
-                            <span>${item.phone}</span>
-                        </div>
+                        <!-- BOTÃO DE CONEXÃO DIRETA COM O WHATSAPP DO CLIENTE -->
+                        <button onclick="chamarWhatsAppCliente('${item.whatsapp}', '${item.name}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-lg my-1">
+                            <i class="fa-brands fa-whatsapp text-lg"></i> Chamar no WhatsApp (${item.whatsapp})
+                        </button>
 
                         <div class="flex justify-end">
-                            <button onclick="denunciarConteudo(${item.id}, '${item.name}')" title="Denunciar" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800 px-4 py-2.5 rounded-xl text-xs flex items-center justify-center transition">
-                                <i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Denunciar Vídeo
+                            <button onclick="denunciarConteudo(${item.id}, '${item.name}')" title="Denunciar" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800 px-3 py-1.5 rounded-xl text-[11px] flex items-center justify-center transition">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Denunciar
                             </button>
                         </div>
                     </div>
                 </div>
             `;}).join('');
 
-            announcements.forEach(async (item, index) => {
-                const vid = document.getElementById(`vid-${item.id}`);
-                if (!vid) return;
-                
-                let videoSrc = "";
+            announcements.forEach(async (item) => {
+                const carouselContainer = document.getElementById(`carousel-${item.id}`);
+                if (!carouselContainer) return;
+
+                let urls = [];
                 if (item.isRemote) {
-                    videoSrc = item.videoUrl;
+                    urls = item.imageUrls;
                 } else {
-                    const blob = await getVideoFromDB(item.id);
-                    videoSrc = blob ? URL.createObjectURL(blob) : "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+                    const blobs = await getImagesFromDB(item.id);
+                    urls = blobs.map(b => URL.createObjectURL(b));
                 }
-                
-                vid.src = videoSrc;
-                
-                // Tenta iniciar a reprodução com som logo na abertura para o primeiro vídeo
-                if (index === 0) {
-                    vid.muted = false;
-                    vid.play().catch(() => {
-                        vid.muted = true; // Fallback caso o navegador bloqueie autoplay com som
-                        vid.play().catch(()=>{});
-                    });
-                }
+
+                carouselContainer.innerHTML = urls.map((url, idx) => `
+                    <img id="img-${item.id}-${idx}" src="${url}" class="absolute inset-0 w-full h-full object-cover" style="display: ${idx === 0 ? 'block' : 'none'};">
+                `).join('');
             });
 
-            setupVideoObservers();
             updateRenovacaoOptions();
         }
 
         function denunciarConteudo(id, nome) {
             const motivo = prompt(`Motivo da denúncia para "${nome}":`);
             if (motivo) {
-                openWhatsAppAdmin(`🚨 *DENÚNCIA DE VÍDEO*\nAnúncio: ${nome}\nMotivo: ${motivo}`);
-                alert('Alerta enviado ao administrador!');
+                openWhatsAppAdmin(`🚨 *DENÚNCIA DE ANÚNCIO (SP)*\nAnúncio: ${nome}\nMotivo: ${motivo}`);
+                alert('Denúncia enviada ao administrador!');
             }
         }
 
-        function setupVideoObservers() {
-            const videos = document.querySelectorAll('.tiktok-item video');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const vid = entry.target;
-                    if (entry.isIntersecting) {
-                        vid.currentTime = 0;
-                        vid.muted = false;
-                        vid.play().catch(error => {
-                            vid.muted = true;
-                            const muteBtn = vid.parentElement.querySelector('button i');
-                            if(muteBtn) muteBtn.className = 'fa-solid fa-volume-xmark';
-                            vid.play().catch(()=>{});
-                        });
-                    } else {
-                        vid.pause();
-                    }
-                });
-            }, { threshold: 0.6 });
-            videos.forEach(v => observer.observe(v));
-        }
-
-        function submitCadastro(e) {
+        async function submitCadastro(e) {
             e.preventDefault();
             
             const plan = document.querySelector('input[name="plan"]:checked').value;
-            const state = document.getElementById('cad-state').value;
             const city = document.getElementById('cad-city').value;
             const name = document.getElementById('cad-name').value;
             const category = document.getElementById('cad-category').value;
-            const phone = document.getElementById('cad-phone').value;
+            const whatsapp = document.getElementById('cad-whatsapp').value;
             const address = document.getElementById('cad-address').value;
             const description = document.getElementById('cad-desc').value;
 
-            const videoFile = document.getElementById('cad-video-file').files[0];
-            if (!videoFile) {
-                alert('Selecione um arquivo de vídeo.');
+            const filesInput = document.getElementById('cad-image-files');
+            if (!filesInput.files || filesInput.files.length === 0) {
+                alert('Selecione pelo menos uma foto.');
                 return;
             }
 
-            tempClientVideoBlob = videoFile;
-            tempClientName = name;
+            const files = Array.from(filesInput.files).slice(0, 5); // Limita a no máximo 5 imagens
+            tempClientImageBlobs = files;
 
             const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
             activeCadastro = {
                 id: Date.now(),
-                name, state, city, category, plan, phone, address,
+                name, state: 'SP', city, category, plan, whatsapp, address,
                 isRemote: false,
+                countBlobs: files.length,
                 description,
                 expiresAt
             };
@@ -840,7 +787,7 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
                 <div class="bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center gap-2">
                     <div>
                         <div class="text-xs font-bold text-white">${i.name} <span class="text-blue-400">(${i.plan})</span></div>
-                        <div class="text-[10px] text-slate-400">${i.city}/${i.state}</div>
+                        <div class="text-[10px] text-slate-400">${i.city}/SP - Whats: ${i.whatsapp}</div>
                     </div>
                     <button onclick="removeAdminItem(${i.id})" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded">Remover</button>
                 </div>
@@ -851,7 +798,7 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             if (confirm('Deseja remover este anúncio?')) {
                 announcements = announcements.filter(i => i.id !== id);
                 saveAnnouncementsMeta();
-                await deleteVideoFromDB(id);
+                await deleteImagesFromDB(id);
                 renderAdminList();
                 renderAnnouncements();
             }
