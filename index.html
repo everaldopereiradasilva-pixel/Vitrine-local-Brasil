@@ -57,7 +57,12 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden" onclick="ativarAudioGlobal()">
+
+    <!-- BARRA FLUTUANTE DE ATIVAÇÃO DE SOM GLOBAL -->
+    <div id="global-audio-bar" class="bg-red-600 text-white text-xs py-1.5 px-4 text-center font-bold cursor-pointer z-50 flex items-center justify-center gap-2 shadow-lg animate-pulse" onclick="ativarAudioGlobal()">
+        <i class="fa-solid fa-volume-high text-sm"></i> Toque aqui para ativar o som de todos os vídeos instantaneamente!
+    </div>
 
     <!-- Top Navigation Header -->
     <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-xl h-[65px] flex items-center">
@@ -124,7 +129,7 @@
             <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
                 <i class="fa-solid fa-video text-red-500"></i> Publicar Vídeo na Vitrine
             </h3>
-            <p class="text-xs text-slate-400 mb-3">Envie um vídeo curto (até 30 segundos) para o seu anúncio.</p>
+            <p class="text-xs text-slate-400 mb-3">Envie um vídeo de até 30 segundos (Armazenamento Gigante Gigabytes).</p>
 
             <form id="form-cadastro" onsubmit="submitCadastro(event)" class="space-y-3">
                 <!-- VÍDEO DE PROPAGANDA -->
@@ -133,7 +138,7 @@
                         <i class="fa-solid fa-file-video text-red-500 text-sm"></i> Selecionar Vídeo (MP4/WebM):
                     </label>
                     <input type="file" id="cad-video-file" accept="video/*" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-500 cursor-pointer">
-                    <p class="text-[10px] text-slate-400 mt-1">Dica: Formato vertical (Reels/TikTok).</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Dica: Sem limite de tamanho restrito (suporta vídeos completos).</p>
                 </div>
 
                 <div>
@@ -358,8 +363,9 @@
         </div>
     </footer>
 
-    <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT COM INDEXEDDB PARA ARMAZENAMENTO GIGANTE DE VÍDEOS -->
     <script>
+        let db;
         let announcements = [];
         let settings = {
             pixKey: '9fe152f5-ffff-4c8a-be31-c874026dea46',
@@ -367,17 +373,69 @@
             adminWhatsApp: '5519989698007'
         };
         let activeCadastro = null;
-        let tempClientVideoUrl = '';
+        let tempClientVideoBlob = null;
         let tempClientName = '';
         let novoAnuncioId = null;
 
-        window.addEventListener('DOMContentLoaded', () => {
+        // Inicializar Banco de Dados IndexedDB (Espaço Gigante)
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('VitrineReelsDB', 1);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    if (!database.objectStoreNames.contains('videos')) {
+                        database.createObjectStore('videos', { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+
+        function saveVideoToDB(id, blob) {
+            return new Promise((resolve, reject) => {
+                if (!db) { resolve(); return; }
+                const transaction = db.transaction(['videos'], 'readwrite');
+                const store = transaction.objectStore('videos');
+                store.put({ id: id, blob: blob });
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+            });
+        }
+
+        function getVideoFromDB(id) {
+            return new Promise((resolve, reject) => {
+                if (!db) { resolve(null); return; }
+                const transaction = db.transaction(['videos'], 'readonly');
+                const store = transaction.objectStore('videos');
+                const request = store.get(id);
+                request.onsuccess = () => resolve(request.result ? request.result.blob : null);
+                request.onerror = () => resolve(null);
+            });
+        }
+
+        function deleteVideoFromDB(id) {
+            return new Promise((resolve) => {
+                if (!db) { resolve(); return; }
+                const transaction = db.transaction(['videos'], 'readwrite');
+                const store = transaction.objectStore('videos');
+                store.delete(id);
+                transaction.oncomplete = () => resolve();
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initDB();
+            } catch (e) {}
             loadStorage();
-            renderAnnouncements();
         });
 
         function loadStorage() {
-            const saved = localStorage.getItem('vitrine_reels_announcements');
+            const saved = localStorage.getItem('vitrine_reels_announcements_meta');
             if (saved) {
                 try { announcements = JSON.parse(saved); } catch (e) { announcements = []; }
             } 
@@ -394,11 +452,14 @@
                         address: "Av. Brasil, 450 - Centro",
                         description: "Os melhores hambúrgueres artesanais na grelha!",
                         videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                        isRemote: true,
                         expiresAt: new Date(Date.now() + 30*24*60*60*1000).toISOString()
                     }
                 ];
-                saveAnnouncements();
+                saveAnnouncementsMeta();
             }
+            renderAnnouncements();
+
             const set = localStorage.getItem('vitrine_reels_settings');
             if (set) {
                 try {
@@ -408,12 +469,10 @@
             }
         }
 
-        function saveAnnouncements() {
+        function saveAnnouncementsMeta() {
             try {
-                localStorage.setItem('vitrine_reels_announcements', JSON.stringify(announcements));
-            } catch (err) {
-                alert('Atenção: O vídeo escolhido é muito grande para o armazenamento local. Usando vídeo otimizado.');
-            }
+                localStorage.setItem('vitrine_reels_announcements_meta', JSON.stringify(announcements));
+            } catch (err) {}
             updateRenovacaoOptions();
         }
 
@@ -425,14 +484,16 @@
         }
 
         function downloadMeuVideo() {
-            if (!tempClientVideoUrl) return;
+            if (!tempClientVideoBlob) return;
             const a = document.createElement('a');
-            a.href = tempClientVideoUrl;
+            const url = URL.createObjectURL(tempClientVideoBlob);
+            a.href = url;
             a.target = '_blank';
             a.download = `meu_video_${tempClientName.toLowerCase().replace(/[^a-z0-9]/g, '_')}.mp4`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
         function prosseguirParaPix() {
@@ -444,11 +505,15 @@
             openModal('modal-pix');
         }
 
-        function confirmarPagamentoPix() {
+        async function confirmarPagamentoPix() {
             if (!activeCadastro) return;
 
+            if (tempClientVideoBlob && !activeCadastro.isRemote) {
+                await saveVideoToDB(activeCadastro.id, tempClientVideoBlob);
+            }
+
             announcements.push(activeCadastro);
-            saveAnnouncements();
+            saveAnnouncementsMeta();
             
             novoAnuncioId = activeCadastro.id;
             
@@ -480,6 +545,7 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             }, 200);
 
             activeCadastro = null;
+            tempClientVideoBlob = null;
         }
 
         function openWhatsAppAdmin(customMessage) {
@@ -487,6 +553,16 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) cleanPhone = '55' + cleanPhone;
             const messageEncoded = encodeURIComponent(customMessage || 'Olá Admin! Nova propaganda na fila.');
             window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${messageEncoded}`, '_blank', 'noopener,noreferrer');
+        }
+
+        function ativarAudioGlobal() {
+            const videos = document.querySelectorAll('.tiktok-item video');
+            videos.forEach(v => {
+                v.muted = false;
+                v.play().catch(()=>{});
+            });
+            const audioBar = document.getElementById('global-audio-bar');
+            if(audioBar) audioBar.style.display = 'none';
         }
 
         function togglePlayPause(videoId, overlayIconId) {
@@ -531,30 +607,23 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             }
 
             container.innerHTML = announcements.map((item) => {
-                const isVideo = item.videoUrl && (item.videoUrl.startsWith('data:video') || item.videoUrl.endsWith('.mp4') || item.videoUrl.endsWith('.webm') || item.videoUrl.includes('commondatastorage.googleapis.com'));
                 const isVIP = item.plan === 'destaque';
 
                 return `
                 <div id="card-${item.id}" class="tiktok-item relative w-full bg-slate-950 flex flex-col justify-end overflow-hidden cursor-pointer" onclick="togglePlayPause('vid-${item.id}', 'icon-${item.id}')">
-                    ${isVideo ? `
-                        <video id="vid-${item.id}" src="${item.videoUrl}" loop muted playsinline webkit-playsinline preload="auto" crossorigin="anonymous" controlslist="nodownload nofullscreen noremoteplayback" oncontextmenu="return false;" class="absolute inset-0 w-full h-full object-cover"></video>
-                    ` : `
-                        <img src="${item.videoUrl}" oncontextmenu="return false;" class="absolute inset-0 w-full h-full object-cover">
-                    `}
+                    <video id="vid-${item.id}" loop playsinline webkit-playsinline preload="auto" crossorigin="anonymous" controlslist="nodownload nofullscreen noremoteplayback" oncontextmenu="return false;" class="absolute inset-0 w-full h-full object-cover"></video>
 
                     <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/95 pointer-events-none"></div>
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                         <i id="icon-${item.id}" class="hidden"></i>
                     </div>
 
-                    ${isVideo ? `
-                        <button onclick="event.stopPropagation(); toggleMute(this, 'vid-${item.id}')" class="absolute top-16 right-4 bg-black/60 backdrop-blur-md text-white p-3 rounded-full z-20 hover:bg-black/80 transition">
-                            <i class="fa-solid fa-volume-xmark"></i>
-                        </button>
-                    ` : ''}
+                    <button onclick="event.stopPropagation(); toggleMute(this, 'vid-${item.id}')" class="absolute top-20 right-4 bg-black/60 backdrop-blur-md text-white p-3 rounded-full z-20 hover:bg-black/80 transition">
+                        <i class="fa-solid fa-volume-high text-emerald-400"></i>
+                    </button>
 
                     ${isVIP ? `
-                        <div class="absolute top-16 left-4 badge-destaque text-slate-950 font-bold text-[10px] uppercase px-3 py-1 rounded-full tracking-wider flex items-center gap-1 z-20 shadow-lg pointer-events-none">
+                        <div class="absolute top-20 left-4 badge-destaque text-slate-950 font-bold text-[10px] uppercase px-3 py-1 rounded-full tracking-wider flex items-center gap-1 z-20 shadow-lg pointer-events-none">
                             <i class="fa-solid fa-crown"></i> VIP Destaque
                         </div>
                     ` : ''}
@@ -590,6 +659,22 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
                 </div>
             `;}).join('');
 
+            // Carregar fontes de vídeo de forma assíncrona do banco IndexedDB ou URL externa
+            announcements.forEach(async (item) => {
+                const vid = document.getElementById(`vid-${item.id}`);
+                if (!vid) return;
+                if (item.isRemote) {
+                    vid.src = item.videoUrl;
+                } else {
+                    const blob = await getVideoFromDB(item.id);
+                    if (blob) {
+                        vid.src = URL.createObjectURL(blob);
+                    } else {
+                        vid.src = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+                    }
+                }
+            });
+
             setupVideoObservers();
             updateRenovacaoOptions();
         }
@@ -609,8 +694,11 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
                     const vid = entry.target;
                     if (entry.isIntersecting) {
                         vid.currentTime = 0;
+                        vid.muted = false;
                         vid.play().catch(error => {
                             vid.muted = true;
+                            const muteBtn = vid.parentElement.querySelector('button i');
+                            if(muteBtn) muteBtn.className = 'fa-solid fa-volume-xmark';
                             vid.play().catch(()=>{});
                         });
                     } else {
@@ -634,48 +722,27 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             const description = document.getElementById('cad-desc').value;
 
             const videoFile = document.getElementById('cad-video-file').files[0];
-            let fallbackUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
+            if (!videoFile) {
+                alert('Selecione um arquivo de vídeo.');
+                return;
+            }
 
-            const processCadastro = (finalMediaUrl) => {
-                const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-                tempClientVideoUrl = finalMediaUrl || fallbackUrl;
-                tempClientName = name;
+            tempClientVideoBlob = videoFile;
+            tempClientName = name;
 
-                activeCadastro = {
-                    id: Date.now(),
-                    name, state, city, category, plan, phone, address,
-                    videoUrl: tempClientVideoUrl,
-                    description,
-                    expiresAt
-                };
+            const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-                closeModal('modal-cadastrar');
-                document.getElementById('form-cadastro').reset();
-                openModal('modal-sucesso-cliente');
+            activeCadastro = {
+                id: Date.now(),
+                name, state, city, category, plan, phone, address,
+                isRemote: false,
+                description,
+                expiresAt
             };
 
-            if (videoFile) {
-                if (videoFile.size > 15 * 1024 * 1024) {
-                    alert('O vídeo selecionado é um pouco grande (acima de 15MB). Por segurança do navegador, usaremos um vídeo de demonstração otimizado, mas poderá guardá-lo na galeria.');
-                    processCadastro(fallbackUrl);
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        processCadastro(e.target.result);
-                    } catch (err) {
-                        processCadastro(fallbackUrl);
-                    }
-                };
-                reader.onerror = function() {
-                    processCadastro(fallbackUrl);
-                };
-                reader.readAsDataURL(videoFile);
-            } else {
-                processCadastro(fallbackUrl);
-            }
+            closeModal('modal-cadastrar');
+            document.getElementById('form-cadastro').reset();
+            openModal('modal-sucesso-cliente');
         }
 
         function handleRenovacao(e) {
@@ -688,7 +755,7 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             if (item) {
                 item.plan = newPlan;
                 item.expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-                saveAnnouncements();
+                saveAnnouncementsMeta();
                 renderAnnouncements();
                 closeModal('modal-renovar');
 
@@ -763,10 +830,11 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             `).join('');
         }
 
-        function removeAdminItem(id) {
+        async function removeAdminItem(id) {
             if (confirm('Deseja remover este anúncio?')) {
                 announcements = announcements.filter(i => i.id !== id);
-                saveAnnouncements();
+                saveAnnouncementsMeta();
+                await deleteVideoFromDB(id);
                 renderAdminList();
                 renderAnnouncements();
             }
