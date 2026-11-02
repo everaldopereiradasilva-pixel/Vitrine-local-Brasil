@@ -363,7 +363,7 @@
         </div>
     </footer>
 
-    <!-- JAVASCRIPT COM INDEXEDDB E CORREÇÃO DE TOQUE/ÁUDIO -->
+    <!-- JAVASCRIPT COM CORREÇÃO DEFINITIVA DO WHATSAPP -->
     <script>
         let db;
         let announcements = [];
@@ -547,6 +547,7 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             tempClientVideoBlob = null;
         }
 
+        // CORREÇÃO: Utiliza o link universal compatível com qualquer navegador/webview sem erro de scheme
         function openWhatsAppAdmin(customMessage) {
             let cleanPhone = String(settings.adminWhatsApp).replace(/\D/g, '');
             if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) cleanPhone = '55' + cleanPhone;
@@ -564,13 +565,11 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             if(audioBar) audioBar.style.display = 'none';
         }
 
-        // CORREÇÃO: Alternar play/pause sem alterar o estado do som (mantém o áudio ligado)
         function togglePlayPause(videoId, overlayIconId) {
             const vid = document.getElementById(videoId);
             const icon = document.getElementById(overlayIconId);
             if (!vid) return;
             
-            // Garante que nunca fica mudo ao clicar para pausar/reproduzir
             vid.muted = false;
 
             if (vid.paused) {
