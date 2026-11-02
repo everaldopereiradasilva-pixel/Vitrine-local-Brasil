@@ -208,13 +208,6 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-300 mb-1">
-                        <i class="fa-brands fa-instagram text-pink-500"></i> Instagram (Usuário ou Link):
-                    </label>
-                    <input type="text" id="cad-instagram" required placeholder="Ex: @seu_negocio" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
-                </div>
-
-                <div>
                     <label class="block text-[11px] font-semibold text-slate-300 mb-1">Endereço / Bairro:</label>
                     <input type="text" id="cad-address" required placeholder="Ex: Rua Central, 120 - Centro" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
                 </div>
@@ -398,7 +391,6 @@
                         category: "Alimentação",
                         plan: "destaque",
                         phone: "019 98877-6655",
-                        instagram: "@hamburgueriaprime",
                         address: "Av. Brasil, 450 - Centro",
                         description: "Os melhores hambúrgueres artesanais na grelha!",
                         videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
@@ -430,32 +422,6 @@
             if (!sel) return;
             sel.innerHTML = '<option value="">Selecione o seu anúncio...</option>' + 
                 announcements.map(i => `<option value="${i.id}">${i.name} (${i.city}/${i.state})</option>`).join('');
-        }
-
-        // FUNÇÃO DE INSTAGRAM CORRIGIDA PARA NÃO DAR PÁGINA DE ERRO
-        function openInstagram(handle) {
-            if (!handle) {
-                alert('Perfil de Instagram não informado.');
-                return;
-            }
-            
-            let clean = handle.trim();
-            // Se for link completo
-            if (clean.includes('instagram.com/')) {
-                let parts = clean.split('instagram.com/');
-                clean = parts[1].split('/')[0].split('?')[0];
-            }
-            
-            // Remove o arroba e caracteres inválidos
-            clean = clean.replace('@', '').replace(/[^a-zA-Z0-9_.]/g, '');
-            
-            if (!clean) {
-                alert('Nome de usuário do Instagram inválido.');
-                return;
-            }
-            
-            const finalUrl = `https://www.instagram.com/${clean}/`;
-            window.open(finalUrl, '_blank', 'noopener,noreferrer');
         }
 
         function downloadMeuVideo() {
@@ -499,7 +465,6 @@
 *Estabelecimento:* ${activeCadastro.name}
 *Plano:* ${activeCadastro.plan.toUpperCase()}
 *Cidade:* ${activeCadastro.city}/${activeCadastro.state}
-*Instagram:* ${activeCadastro.instagram}
 *Telefone:* ${activeCadastro.phone}
 *Descrição:* ${activeCadastro.description}
 
@@ -616,15 +581,9 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
                             <span>${item.phone}</span>
                         </div>
 
-                        <div class="flex gap-2">
-                            ${item.instagram ? `
-                                <button onclick="openInstagram('${item.instagram}')" 
-                                        class="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition transform active:scale-95 cursor-pointer">
-                                    <i class="fa-brands fa-instagram text-base"></i> Instagram
-                                </button>
-                            ` : ''}
-                            <button onclick="denunciarConteudo(${item.id}, '${item.name}')" title="Denunciar" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800 px-3 py-2.5 rounded-xl text-xs flex items-center justify-center transition">
-                                <i class="fa-solid fa-triangle-exclamation"></i>
+                        <div class="flex justify-end">
+                            <button onclick="denunciarConteudo(${item.id}, '${item.name}')" title="Denunciar" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800 px-4 py-2.5 rounded-xl text-xs flex items-center justify-center transition">
+                                <i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Denunciar Vídeo
                             </button>
                         </div>
                     </div>
@@ -671,7 +630,6 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             const name = document.getElementById('cad-name').value;
             const category = document.getElementById('cad-category').value;
             const phone = document.getElementById('cad-phone').value;
-            const instagram = document.getElementById('cad-instagram').value;
             const address = document.getElementById('cad-address').value;
             const description = document.getElementById('cad-desc').value;
 
@@ -685,7 +643,7 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
 
                 activeCadastro = {
                     id: Date.now(),
-                    name, state, city, category, plan, phone, instagram, address,
+                    name, state, city, category, plan, phone, address,
                     videoUrl: tempClientVideoUrl,
                     description,
                     expiresAt
