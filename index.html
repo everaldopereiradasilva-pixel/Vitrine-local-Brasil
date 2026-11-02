@@ -58,11 +58,11 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden">
 
-    <!-- Top Navigation Header -->
+    <!-- Top Navigation Header (Botão admin oculto dos clientes, acesso via duplo clique no Logo) -->
     <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-xl h-[65px] flex items-center">
         <div class="max-w-md mx-auto w-full px-3 flex items-center justify-between gap-1">
-            <!-- Logo Regional SP -->
-            <div class="flex items-center space-x-2">
+            <!-- Logo Regional SP com acionador oculto do Admin (Duplo Clique) -->
+            <div class="flex items-center space-x-2 cursor-pointer select-none" ondblclick="openAdminModal()" title="Dê duplo clique para gerenciar">
                 <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-amber-500 flex items-center justify-center shadow-lg shadow-red-600/40 neon-glow">
                     <i class="fa-solid fa-store text-white text-sm"></i>
                 </div>
@@ -74,16 +74,13 @@
                 </div>
             </div>
 
-            <!-- Ações Rápidas do Cabeçalho -->
-            <div class="flex items-center gap-1">
-                <button onclick="openAdminModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md border border-slate-700" title="Painel Admin">
-                    <i class="fa-solid fa-lock text-[10px] text-amber-400"></i> Admin
+            <!-- Ações Rápidas do Cabeçalho (Sem o botão admin visível para clientes) -->
+            <div class="flex items-center gap-1.5">
+                <button onclick="openModal('modal-renovar')" class="bg-amber-600/90 hover:bg-amber-500 text-white text-xs px-2.5 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
+                    <i class="fa-solid fa-rotate text-xs"></i> Renovar
                 </button>
-                <button onclick="openModal('modal-renovar')" class="bg-amber-600/90 hover:bg-amber-500 text-white text-[11px] px-2 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
-                    <i class="fa-solid fa-rotate text-[10px]"></i> Renovar
-                </button>
-                <button onclick="openModal('modal-cadastrar')" class="bg-red-600 hover:bg-red-500 text-white text-[11px] px-2 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
-                    <i class="fa-solid fa-images text-[10px]"></i> Anunciar (Até 5 Fotos)
+                <button onclick="openModal('modal-cadastrar')" class="bg-red-600 hover:bg-red-500 text-white text-xs px-2.5 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
+                    <i class="fa-solid fa-images text-xs"></i> Anunciar
                 </button>
             </div>
         </div>
@@ -129,7 +126,7 @@
             <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
                 <i class="fa-solid fa-images text-red-500"></i> Anunciar na Vitrine de SP
             </h3>
-            <p class="text-xs text-slate-400 mb-3">Selecione **até 5 fotos** dos seus produtos diretamente da sua galeria.</p>
+            <p class="text-xs text-slate-400 mb-3">Selecione <strong>até 5 fotos</strong> dos seus produtos diretamente da sua galeria.</p>
 
             <form id="form-cadastro" onsubmit="submitCadastro(event)" class="space-y-3">
                 
@@ -139,7 +136,7 @@
                         <i class="fa-solid fa-images text-red-500 text-sm"></i> Fotos dos Produtos (Selecione até 5):
                     </label>
                     <input type="file" id="cad-image-files" accept="image/*" multiple required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-500 cursor-pointer">
-                    <p class="text-[10px] text-slate-400 mt-1">Dica: Segure Ctrl (ou selecione múltiplos ficheiros no telemóvel) para escolher até 5 imagens.</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Dica: Selecione múltiplos ficheiros na galeria do seu telemóvel para enviar até 5 imagens.</p>
                 </div>
 
                 <div>
@@ -205,7 +202,10 @@
                     </div>
                     <div>
                         <label class="block text-[11px] font-semibold text-emerald-400 mb-1"><i class="fa-brands fa-whatsapp"></i> WhatsApp (DDD + Nº):</label>
-                        <input type="tel" id="cad-whatsapp" required placeholder="19 99999-9999" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+                        <div class="relative flex items-center">
+                            <span class="absolute left-2.5 text-xs text-slate-400 font-bold">+55</span>
+                            <input type="tel" id="cad-whatsapp" required placeholder="19 99999-9999" class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-2.5 py-1.5 text-xs text-slate-200">
+                        </div>
                     </div>
                 </div>
 
@@ -226,7 +226,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE SUCESSO DE CADASTRO COM DOWNLOAD DAS FOTOS -->
+    <!-- MODAL DE SUCESSO DE CADASTRO -->
     <div id="modal-sucesso-cliente" class="fixed inset-0 bg-black/85 z-50 hidden items-center justify-center p-4">
         <div class="bg-slate-900 rounded-xl border border-slate-800 max-w-xs w-full p-5 relative text-center shadow-2xl">
             <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-2 text-lg">
@@ -310,7 +310,7 @@
         </div>
     </div>
 
-    <!-- MODAL 4: Painel Admin -->
+    <!-- MODAL 4: Painel Admin (Oculto para clientes) -->
     <div id="modal-admin" class="fixed inset-0 bg-black/85 z-50 hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-slate-900 rounded-xl border border-slate-800 max-w-lg w-full p-5 relative my-auto shadow-2xl">
             <button onclick="closeModal('modal-admin')" class="absolute top-3 right-3 text-slate-400 hover:text-white">
@@ -352,12 +352,12 @@
         <div class="max-w-md mx-auto w-full px-4 flex justify-between items-center">
             <p>© 2026 Vitrine Local SP - Exclusivo São Paulo</p>
             <span class="text-slate-400 flex items-center gap-1">
-                <i class="fa-solid fa-bolt text-[9px] text-emerald-400"></i> Até 5 Fotos por Anúncio
+                <i class="fa-solid fa-shield-halved text-[9px] text-emerald-400"></i> Área Protegida
             </span>
         </div>
     </footer>
 
-    <!-- JAVASCRIPT DO SISTEMA REGIONAL DE SP COM SUPORTE A 5 FOTOS -->
+    <!-- JAVASCRIPT -->
     <script>
         let db;
         let announcements = [];
@@ -369,6 +369,15 @@
         let activeCadastro = null;
         let tempClientImageBlobs = [];
         let novoAnuncioId = null;
+
+        function formatWhatsAppNumber(phone) {
+            let digits = String(phone).replace(/\D/g, '');
+            if (digits.length === 0) return '55';
+            if (!digits.startsWith('55')) {
+                digits = '55' + digits;
+            }
+            return digits;
+        }
 
         function initDB() {
             return new Promise((resolve, reject) => {
@@ -513,7 +522,7 @@
 *Estabelecimento:* ${activeCadastro.name}
 *Plano:* ${activeCadastro.plan.toUpperCase()}
 *Cidade:* ${activeCadastro.city}/SP
-*WhatsApp Cliente:* ${activeCadastro.whatsapp}
+*WhatsApp Cliente:* +${activeCadastro.whatsapp}
 *Descrição:* ${activeCadastro.description}
 
 O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
@@ -532,20 +541,17 @@ O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
         }
 
         function openWhatsAppAdmin(customMessage) {
-            let cleanPhone = String(settings.adminWhatsApp).replace(/\D/g, '');
-            if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) cleanPhone = '55' + cleanPhone;
+            let cleanPhone = formatWhatsAppNumber(settings.adminWhatsApp);
             const messageEncoded = encodeURIComponent(customMessage || 'Olá Admin! Novo anúncio na fila.');
             window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${messageEncoded}`, '_blank', 'noopener,noreferrer');
         }
 
         function chamarWhatsAppCliente(phone, name) {
-            let cleanPhone = String(phone).replace(/\D/g, '');
-            if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) cleanPhone = '55' + cleanPhone;
+            let cleanPhone = formatWhatsAppNumber(phone);
             const msg = encodeURIComponent(`Olá ${name}! Vi o seu anúncio na Vitrine Local SP e gostaria de mais informações sobre os produtos.`);
             window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${msg}`, '_blank', 'noopener,noreferrer');
         }
 
-        // Funções para alternar as fotos do carrossel do card
         window.mudarFotoCard = function(cardId, direction, total) {
             let currentIndex = parseInt(window.eval(`cardIndex_${cardId}`) || 0);
             currentIndex += direction;
@@ -586,13 +592,11 @@ O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
                 const isVIP = item.plan === 'destaque';
                 window[`cardIndex_${item.id}`] = 0;
                 const totalFotos = item.isRemote ? item.imageUrls.length : (item.countBlobs || 1);
+                const fullWhatsApp = formatWhatsAppNumber(item.whatsapp);
 
                 return `
                 <div id="card-${item.id}" class="sp-item relative w-full bg-slate-950 flex flex-col justify-end overflow-hidden">
-                    <!-- Container das imagens (Carrossel) -->
-                    <div id="carousel-${item.id}" class="absolute inset-0 w-full h-full bg-black">
-                        <!-- As imagens serão inseridas dinamicamente via JS -->
-                    </div>
+                    <div id="carousel-${item.id}" class="absolute inset-0 w-full h-full bg-black"></div>
 
                     <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/95 pointer-events-none"></div>
 
@@ -631,9 +635,8 @@ O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
                             <i class="fa-solid fa-map-pin text-blue-400"></i> ${item.address}
                         </div>
 
-                        <!-- BOTÃO DE CONEXÃO DIRETA COM O WHATSAPP DO CLIENTE -->
-                        <button onclick="chamarWhatsAppCliente('${item.whatsapp}', '${item.name}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-lg my-1">
-                            <i class="fa-brands fa-whatsapp text-lg"></i> Chamar no WhatsApp (${item.whatsapp})
+                        <button onclick="chamarWhatsAppCliente('${fullWhatsApp}', '${item.name}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-lg my-1">
+                            <i class="fa-brands fa-whatsapp text-lg"></i> Chamar no WhatsApp (+${fullWhatsApp})
                         </button>
 
                         <div class="flex justify-end">
@@ -680,7 +683,10 @@ O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
             const city = document.getElementById('cad-city').value;
             const name = document.getElementById('cad-name').value;
             const category = document.getElementById('cad-category').value;
-            const whatsapp = document.getElementById('cad-whatsapp').value;
+            
+            const rawWhatsapp = document.getElementById('cad-whatsapp').value;
+            const whatsapp = formatWhatsAppNumber(rawWhatsapp);
+            
             const address = document.getElementById('cad-address').value;
             const description = document.getElementById('cad-desc').value;
 
@@ -690,7 +696,7 @@ O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
                 return;
             }
 
-            const files = Array.from(filesInput.files).slice(0, 5); // Limita a no máximo 5 imagens
+            const files = Array.from(filesInput.files).slice(0, 5);
             tempClientImageBlobs = files;
 
             const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -762,7 +768,7 @@ O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
                 document.getElementById('admin-login-view').classList.add('hidden');
                 document.getElementById('admin-dashboard-view').classList.remove('hidden');
                 document.getElementById('admin-pix-key').value = settings.pixKey;
-                document.getElementById('admin-whatsapp-num').value = settings.adminWhatsApp;
+                document.getElementById('admin-whatsapp-num').value = formatWhatsAppNumber(settings.adminWhatsApp);
                 renderAdminList();
             } else { alert('Senha incorreta!'); }
         }
@@ -771,7 +777,7 @@ O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
 
         function saveSettings() {
             settings.pixKey = document.getElementById('admin-pix-key').value;
-            settings.adminWhatsApp = document.getElementById('admin-whatsapp-num').value.replace(/\D/g,'');
+            settings.adminWhatsApp = formatWhatsAppNumber(document.getElementById('admin-whatsapp-num').value);
             localStorage.setItem('vitrine_reels_settings', JSON.stringify(settings));
             alert('Configurações salvas!');
         }
@@ -787,7 +793,7 @@ O anúncio com fotos foi publicado com sucesso na Vitrine SP!`;
                 <div class="bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center gap-2">
                     <div>
                         <div class="text-xs font-bold text-white">${i.name} <span class="text-blue-400">(${i.plan})</span></div>
-                        <div class="text-[10px] text-slate-400">${i.city}/SP - Whats: ${i.whatsapp}</div>
+                        <div class="text-[10px] text-slate-400">${i.city}/SP - Whats: +${formatWhatsAppNumber(i.whatsapp)}</div>
                     </div>
                     <button onclick="removeAdminItem(${i.id})" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded">Remover</button>
                 </div>
