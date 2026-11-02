@@ -57,33 +57,36 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden" onclick="ativarAudioGlobal()">
 
     <!-- BARRA FLUTUANTE DE ATIVAÇÃO DE SOM GLOBAL -->
     <div id="global-audio-bar" class="bg-red-600 text-white text-xs py-1.5 px-4 text-center font-bold cursor-pointer z-50 flex items-center justify-center gap-2 shadow-lg animate-pulse" onclick="ativarAudioGlobal()">
         <i class="fa-solid fa-volume-high text-sm"></i> Toque aqui para ativar o som de todos os vídeos instantaneamente!
     </div>
 
-    <!-- Top Navigation Header -->
+    <!-- Top Navigation Header com Botão Admin Integrado -->
     <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-xl h-[65px] flex items-center">
-        <div class="max-w-md mx-auto w-full px-4 flex items-center justify-between gap-2">
+        <div class="max-w-md mx-auto w-full px-3 flex items-center justify-between gap-1">
             <!-- Logo e Título com Ícone Chamativo -->
-            <div class="flex items-center space-x-2.5">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-amber-500 flex items-center justify-center shadow-lg shadow-red-600/40 neon-glow animate-pulse">
-                    <i class="fa-solid fa-play text-white text-base ml-0.5"></i>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-amber-500 flex items-center justify-center shadow-lg shadow-red-600/40 neon-glow animate-pulse">
+                    <i class="fa-solid fa-play text-white text-sm ml-0.5"></i>
                 </div>
-                <h1 class="text-base font-extrabold bg-gradient-to-r from-white via-slate-200 to-red-400 bg-clip-text text-transparent tracking-wide">
+                <h1 class="text-sm font-extrabold bg-gradient-to-r from-white via-slate-200 to-red-400 bg-clip-text text-transparent tracking-wide">
                     Vitrine Reels
                 </h1>
             </div>
 
-            <!-- Ações Rápidas -->
-            <div class="flex items-center gap-1.5">
-                <button onclick="openModal('modal-renovar')" class="bg-amber-600/90 hover:bg-amber-500 text-white text-xs px-2.5 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
-                    <i class="fa-solid fa-rotate text-xs"></i> Renovação
+            <!-- Ações Rápidas incluindo o Botão Admin -->
+            <div class="flex items-center gap-1">
+                <button onclick="openAdminModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md border border-slate-700" title="Painel Admin">
+                    <i class="fa-solid fa-lock text-[10px] text-amber-400"></i> Admin
                 </button>
-                <button onclick="openModal('modal-cadastrar')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-2.5 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
-                    <i class="fa-solid fa-plus"></i> Anunciar
+                <button onclick="openModal('modal-renovar')" class="bg-amber-600/90 hover:bg-amber-500 text-white text-[11px] px-2 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
+                    <i class="fa-solid fa-rotate text-[10px]"></i> Renovar
+                </button>
+                <button onclick="openModal('modal-cadastrar')" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] px-2 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 shadow-md">
+                    <i class="fa-solid fa-plus text-[10px]"></i> Anunciar
                 </button>
             </div>
         </div>
@@ -357,13 +360,13 @@
     <footer class="bg-slate-900 border-t border-slate-800 py-2 text-center text-[10px] text-slate-500 z-30 h-[33px] flex items-center justify-center">
         <div class="max-w-md mx-auto w-full px-4 flex justify-between items-center">
             <p>© 2026 Vitrine Local Reels</p>
-            <button onclick="openAdminModal()" class="text-slate-400 hover:text-blue-400 flex items-center gap-1">
-                <i class="fa-solid fa-lock text-[9px]"></i> Painel Admin
-            </button>
+            <span class="text-slate-400 flex items-center gap-1">
+                <i class="fa-solid fa-bolt text-[9px] text-emerald-400"></i> Sistema Ativo
+            </span>
         </div>
     </footer>
 
-    <!-- JAVASCRIPT COM CORREÇÃO DEFINITIVA DO WHATSAPP -->
+    <!-- JAVASCRIPT COM AUTOPLAY DE ÁUDIO IMEDIATO E INDEXEDDB -->
     <script>
         let db;
         let announcements = [];
@@ -547,7 +550,6 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             tempClientVideoBlob = null;
         }
 
-        // CORREÇÃO: Utiliza o link universal compatível com qualquer navegador/webview sem erro de scheme
         function openWhatsAppAdmin(customMessage) {
             let cleanPhone = String(settings.adminWhatsApp).replace(/\D/g, '');
             if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) cleanPhone = '55' + cleanPhone;
@@ -555,6 +557,7 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${messageEncoded}`, '_blank', 'noopener,noreferrer');
         }
 
+        // Tenta ativar o som imediatamente ao carregar ou interagir
         function ativarAudioGlobal() {
             const videos = document.querySelectorAll('.tiktok-item video');
             videos.forEach(v => {
@@ -665,18 +668,27 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
                 </div>
             `;}).join('');
 
-            announcements.forEach(async (item) => {
+            announcements.forEach(async (item, index) => {
                 const vid = document.getElementById(`vid-${item.id}`);
                 if (!vid) return;
+                
+                let videoSrc = "";
                 if (item.isRemote) {
-                    vid.src = item.videoUrl;
+                    videoSrc = item.videoUrl;
                 } else {
                     const blob = await getVideoFromDB(item.id);
-                    if (blob) {
-                        vid.src = URL.createObjectURL(blob);
-                    } else {
-                        vid.src = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
-                    }
+                    videoSrc = blob ? URL.createObjectURL(blob) : "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+                }
+                
+                vid.src = videoSrc;
+                
+                // Tenta iniciar a reprodução com som logo na abertura para o primeiro vídeo
+                if (index === 0) {
+                    vid.muted = false;
+                    vid.play().catch(() => {
+                        vid.muted = true; // Fallback caso o navegador bloqueie autoplay com som
+                        vid.play().catch(()=>{});
+                    });
                 }
             });
 
