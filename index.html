@@ -438,15 +438,21 @@
             document.getElementById('modal-zoom').classList.add('hidden');
         }
 
-        // Função otimizada para formatar e gerar o link do WhatsApp perfeitamente
+        // CORREÇÃO SEGURA DA CONEXÃO DO WHATSAPP (Tratamento limpo de números)
         function getWhatsAppLink(rawPhone, establishmentName) {
-            let cleanPhone = rawPhone.replace(/\D/g, '');
-            // Se o número não tiver o DDI 55, adiciona automaticamente
-            if (!cleanPhone.startsWith('55') && cleanPhone.length >= 10) {
+            if (!rawPhone) return '#';
+            let cleanPhone = String(rawPhone).replace(/\D/g, '');
+            
+            // Garante o DDI 55 do Brasil se faltar
+            if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) {
                 cleanPhone = '55' + cleanPhone;
             }
-            const message = encodeURIComponent(`Olá! Vi o anúncio da *${establishmentName}* no *Vitrine Local Brasil* e gostaria de mais informações.`);
-            return `https://wa.me/${cleanPhone}?text=${message}`;
+            
+            // Tratamento rigoroso do texto para evitar erros de URI Encoding
+            const safeName = establishmentName ? String(establishmentName).replace(/[^\w\sÀ-ÿ]/gi, '').trim() : 'Estabelecimento';
+            const message = `Olá! Vi o anúncio da ${safeName} no Vitrine Local Brasil e gostaria de mais informações.`;
+            
+            return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
         }
 
         function renderAnnouncements() {
@@ -491,7 +497,7 @@
                             <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot"></i> ${item.address}</p>
                             <p class="text-xs text-slate-300 my-2">${item.description}</p>
                         </div>
-                        <a href="${getWhatsAppLink(item.phone, item.name)}" target="_blank" 
+                        <a href="${getWhatsAppLink(item.phone, item.name)}" target="_blank" rel="noopener noreferrer"
                            class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-2 mt-3 transition shadow-md">
                             <i class="fa-brands fa-whatsapp text-sm"></i> Chamar no WhatsApp
                         </a>
@@ -516,7 +522,7 @@
                             <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot"></i> ${item.address}</p>
                             <p class="text-xs text-slate-300 my-2">${item.description}</p>
                         </div>
-                        <a href="${getWhatsAppLink(item.phone, item.name)}" target="_blank" 
+                        <a href="${getWhatsAppLink(item.phone, item.name)}" target="_blank" rel="noopener noreferrer"
                            class="w-full bg-slate-700 hover:bg-emerald-600 text-slate-200 hover:text-white font-semibold py-1.5 rounded text-xs flex items-center justify-center gap-1.5 mt-2 transition">
                             <i class="fa-brands fa-whatsapp"></i> Contatar
                         </a>
@@ -613,8 +619,12 @@
             
             document.getElementById('client-status-banner').classList.remove('hidden');
 
-            const msg = encodeURIComponent(`🔥 *NOVO PIX REALIZADO NO VITRINE LOCAL!*\n\n*Estabelecimento:* ${activeCadastro.name}\n*Plano:* ${activeCadastro.plan.toUpperCase()}\n*Local:* ${activeCadastro.city}/${activeCadastro.state}\n*Tel:* ${activeCadastro.phone}\n\nO anúncio já está no ar com as fotos da loja e propaganda! Segue meu comprovante de pagamento.`);
-            window.open(`https://wa.me/${settings.adminWhatsApp}?text=${msg}`, '_blank');
+            const msg = `🔥 NOVO PIX REALIZADO NO VITRINE LOCAL!\n\nEstabelecimento: ${activeCadastro.name}\nPlano: ${activeCadastro.plan.toUpperCase()}\nLocal: ${activeCadastro.city}/${activeCadastro.state}\nTel: ${activeCadastro.phone}\n\nO anúncio já está no ar com as fotos da loja e propaganda! Segue meu comprovante de pagamento.`;
+            
+            const adminPhoneClean = String(settings.adminWhatsApp).replace(/\D/g, '');
+            const whatsappAdminUrl = `https://wa.me/${adminPhoneClean}?text=${encodeURIComponent(msg)}`;
+            
+            window.open(whatsappAdminUrl, '_blank', 'noopener,noreferrer');
 
             closeModal('modal-pix');
             alert('Excelente! Seu anúncio já está ativo e visível na vitrine!');
