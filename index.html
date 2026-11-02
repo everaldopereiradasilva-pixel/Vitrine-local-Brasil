@@ -57,7 +57,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden" onclick="ativarAudioGlobal()">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden">
 
     <!-- BARRA FLUTUANTE DE ATIVAÇÃO DE SOM GLOBAL -->
     <div id="global-audio-bar" class="bg-red-600 text-white text-xs py-1.5 px-4 text-center font-bold cursor-pointer z-50 flex items-center justify-center gap-2 shadow-lg animate-pulse" onclick="ativarAudioGlobal()">
@@ -129,7 +129,7 @@
             <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
                 <i class="fa-solid fa-video text-red-500"></i> Publicar Vídeo na Vitrine
             </h3>
-            <p class="text-xs text-slate-400 mb-3">Envie um vídeo de até 30 segundos (Armazenamento Gigante Gigabytes).</p>
+            <p class="text-xs text-slate-400 mb-3">Envie o seu vídeo (Armazenamento Ilimitado).</p>
 
             <form id="form-cadastro" onsubmit="submitCadastro(event)" class="space-y-3">
                 <!-- VÍDEO DE PROPAGANDA -->
@@ -138,7 +138,7 @@
                         <i class="fa-solid fa-file-video text-red-500 text-sm"></i> Selecionar Vídeo (MP4/WebM):
                     </label>
                     <input type="file" id="cad-video-file" accept="video/*" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-500 cursor-pointer">
-                    <p class="text-[10px] text-slate-400 mt-1">Dica: Sem limite de tamanho restrito (suporta vídeos completos).</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Dica: Suporte total a arquivos grandes sem limite de espaço.</p>
                 </div>
 
                 <div>
@@ -363,7 +363,7 @@
         </div>
     </footer>
 
-    <!-- JAVASCRIPT COM INDEXEDDB PARA ARMAZENAMENTO GIGANTE DE VÍDEOS -->
+    <!-- JAVASCRIPT COM INDEXEDDB E CORREÇÃO DE TOQUE/ÁUDIO -->
     <script>
         let db;
         let announcements = [];
@@ -377,10 +377,9 @@
         let tempClientName = '';
         let novoAnuncioId = null;
 
-        // Inicializar Banco de Dados IndexedDB (Espaço Gigante)
         function initDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open('VitrineReelsDB', 1);
+                const request = indexedDB.open('VitrineReelsInfinitDB', 1);
                 request.onerror = () => reject(request.error);
                 request.onsuccess = () => {
                     db = request.result;
@@ -407,7 +406,7 @@
         }
 
         function getVideoFromDB(id) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 if (!db) { resolve(null); return; }
                 const transaction = db.transaction(['videos'], 'readonly');
                 const store = transaction.objectStore('videos');
@@ -565,10 +564,15 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
             if(audioBar) audioBar.style.display = 'none';
         }
 
+        // CORREÇÃO: Alternar play/pause sem alterar o estado do som (mantém o áudio ligado)
         function togglePlayPause(videoId, overlayIconId) {
             const vid = document.getElementById(videoId);
             const icon = document.getElementById(overlayIconId);
             if (!vid) return;
+            
+            // Garante que nunca fica mudo ao clicar para pausar/reproduzir
+            vid.muted = false;
+
             if (vid.paused) {
                 vid.play().then(() => {
                     if (icon) {
@@ -578,7 +582,10 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
                 }).catch(e => {});
             } else {
                 vid.pause();
-                if (icon) icon.className = 'fa-solid fa-pause text-white text-5xl opacity-80';
+                if (icon) {
+                    icon.className = 'fa-solid fa-pause text-white text-5xl opacity-80';
+                    icon.classList.remove('hidden');
+                }
             }
         }
 
@@ -659,7 +666,6 @@ O vídeo foi adicionado no final da sequência e já está a rodar na vitrine do
                 </div>
             `;}).join('');
 
-            // Carregar fontes de vídeo de forma assíncrona do banco IndexedDB ou URL externa
             announcements.forEach(async (item) => {
                 const vid = document.getElementById(`vid-${item.id}`);
                 if (!vid) return;
