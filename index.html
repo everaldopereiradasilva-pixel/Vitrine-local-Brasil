@@ -438,21 +438,22 @@
             document.getElementById('modal-zoom').classList.add('hidden');
         }
 
-        // CORREÇÃO SEGURA DA CONEXÃO DO WHATSAPP (Tratamento limpo de números)
-        function getWhatsAppLink(rawPhone, establishmentName) {
-            if (!rawPhone) return '#';
+        // FUNÇÃO ROBUSTA DE REDIRECIONAMENTO AO WHATSAPP (Evita bloqueios em PWAs/Mobile)
+        function openWhatsApp(rawPhone, customMessage) {
+            if (!rawPhone) return;
             let cleanPhone = String(rawPhone).replace(/\D/g, '');
-            
-            // Garante o DDI 55 do Brasil se faltar
             if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) {
                 cleanPhone = '55' + cleanPhone;
             }
             
-            // Tratamento rigoroso do texto para evitar erros de URI Encoding
-            const safeName = establishmentName ? String(establishmentName).replace(/[^\w\sÀ-ÿ]/gi, '').trim() : 'Estabelecimento';
-            const message = `Olá! Vi o anúncio da ${safeName} no Vitrine Local Brasil e gostaria de mais informações.`;
+            const messageEncoded = encodeURIComponent(customMessage || 'Olá! Gostaria de mais informações sobre o anúncio.');
+            const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${messageEncoded}`;
             
-            return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+            // Abre de forma segura garantindo compatibilidade com WebView e PWA
+            const win = window.open(url, '_blank', 'noopener,noreferrer');
+            if (!win) {
+                window.location.href = url;
+            }
         }
 
         function renderAnnouncements() {
@@ -480,7 +481,9 @@
 
             document.getElementById('container-destaque').innerHTML = destaques.length === 0 ? 
                 `<div class="col-span-full bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 text-center text-xs text-slate-400">Nenhum destaque encontrado.</div>` :
-                destaques.map(item => `
+                destaques.map(item => {
+                    const msg = `Olá! Vi o anúncio da ${item.name} no Vitrine Local Brasil e gostaria de mais informações.`;
+                    return `
                     <div class="bg-slate-800 rounded-xl border-2 border-amber-500/50 p-4 relative shadow-xl flex flex-col justify-between">
                         <div>
                             <div class="absolute top-0 right-0 badge-destaque text-slate-950 font-bold text-[10px] uppercase px-3 py-0.5 rounded-bl-lg tracking-wider flex items-center gap-1 z-10">
@@ -497,16 +500,18 @@
                             <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot"></i> ${item.address}</p>
                             <p class="text-xs text-slate-300 my-2">${item.description}</p>
                         </div>
-                        <a href="${getWhatsAppLink(item.phone, item.name)}" target="_blank" rel="noopener noreferrer"
-                           class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-2 mt-3 transition shadow-md">
+                        <button onclick="openWhatsApp('${item.phone}', '${msg.replace(/'/g, "\\'")}')" 
+                           class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-2 mt-3 transition shadow-md cursor-pointer">
                             <i class="fa-brands fa-whatsapp text-sm"></i> Chamar no WhatsApp
-                        </a>
+                        </button>
                     </div>
-                `).join('');
+                `;}).join('');
 
             document.getElementById('container-geral').innerHTML = gerais.length === 0 ? 
                 `<div class="col-span-full bg-slate-800/40 border border-slate-700/50 rounded-xl p-8 text-center text-xs text-slate-400">Nenhum anúncio encontrado.</div>` :
-                gerais.map(item => `
+                gerais.map(item => {
+                    const msg = `Olá! Vi o anúncio da ${item.name} no Vitrine Local Brasil e gostaria de mais informações.`;
+                    return `
                     <div class="bg-slate-800 rounded-xl border border-slate-700 p-4 flex flex-col justify-between">
                         <div>
                             <div class="grid grid-cols-2 gap-2 mb-2">
@@ -522,12 +527,12 @@
                             <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot"></i> ${item.address}</p>
                             <p class="text-xs text-slate-300 my-2">${item.description}</p>
                         </div>
-                        <a href="${getWhatsAppLink(item.phone, item.name)}" target="_blank" rel="noopener noreferrer"
-                           class="w-full bg-slate-700 hover:bg-emerald-600 text-slate-200 hover:text-white font-semibold py-1.5 rounded text-xs flex items-center justify-center gap-1.5 mt-2 transition">
+                        <button onclick="openWhatsApp('${item.phone}', '${msg.replace(/'/g, "\\'")}')" 
+                           class="w-full bg-slate-700 hover:bg-emerald-600 text-slate-200 hover:text-white font-semibold py-1.5 rounded text-xs flex items-center justify-center gap-1.5 mt-2 transition cursor-pointer">
                             <i class="fa-brands fa-whatsapp"></i> Contatar
-                        </a>
+                        </button>
                     </div>
-                `).join('');
+                `;}).join('');
         }
 
         function filterAnnouncements() { renderAnnouncements(); }
@@ -619,12 +624,9 @@
             
             document.getElementById('client-status-banner').classList.remove('hidden');
 
-            const msg = `🔥 NOVO PIX REALIZADO NO VITRINE LOCAL!\n\nEstabelecimento: ${activeCadastro.name}\nPlano: ${activeCadastro.plan.toUpperCase()}\nLocal: ${activeCadastro.city}/${activeCadastro.state}\nTel: ${activeCadastro.phone}\n\nO anúncio já está no ar com as fotos da loja e propaganda! Segue meu comprovante de pagamento.`;
+            const msg = `🔥 *NOVO PIX REALIZADO NO VITRINE LOCAL!*\n\n*Estabelecimento:* ${activeCadastro.name}\n*Plano:* ${activeCadastro.plan.toUpperCase()}\n*Local:* ${activeCadastro.city}/${activeCadastro.state}\n*Tel:* ${activeCadastro.phone}\n\nO anúncio já está no ar com as fotos da loja e propaganda! Segue meu comprovante de pagamento.`;
             
-            const adminPhoneClean = String(settings.adminWhatsApp).replace(/\D/g, '');
-            const whatsappAdminUrl = `https://wa.me/${adminPhoneClean}?text=${encodeURIComponent(msg)}`;
-            
-            window.open(whatsappAdminUrl, '_blank', 'noopener,noreferrer');
+            openWhatsApp(settings.adminWhatsApp, msg);
 
             closeModal('modal-pix');
             alert('Excelente! Seu anúncio já está ativo e visível na vitrine!');
